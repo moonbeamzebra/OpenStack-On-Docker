@@ -1,5 +1,5 @@
 .PHONY: all
-all: install_uchiwa
+all: install_keystone
 
 docker.t:
     sudo apt-get update
