@@ -41,30 +41,6 @@ build_keystone: build_openstack_base
 install_keystone: build_keystone install_mariadb
     sudo docker run -d --name openstack-keystone -p 5000:5000 -p 35357:35357 -e KEYSTONEDBPASS=lab1 -e ROOTDBPASS=lab1 -e MYSQLHOST=openstack-mariadb --link openstack-mariadb openstack-keystone
 
-.PHONY: build_redis
-build_redis: install_docker
-#    sudo docker pull redis:3
-
-.PHONY: install_redis
-install_redis: build_redis
-    sudo docker run --name redis_service -d redis:3
-
-.PHONY: build_sensu_server
-build_sensu_server: install_docker
-    sudo makepp -C dockerfiles/sensu-server build_image
-
-.PHONY: install_sensu_server
-install_sensu_server: install_rabbitmq install_redis build_sensu_server 
-    sudo docker run --name sensu_server_service -p 4567:4567 --link rabbitmq_service --link redis_service -d sensu_server
-
-.PHONY: build_uchiwa
-build_uchiwa: install_docker
-#    sudo docker pull uchiwa/uchiwa
-
-.PHONY: install_uchiwa
-install_uchiwa: install_sensu_server build_uchiwa
-    docker run -d -p 80:3000 --name uchiwa_service --link sensu_server_service -v $(absolute_filename dockerfiles/uchiwa):/config uchiwa/uchiwa
-
 .PHONY: clean
 clean:
     sudo docker stop $(shell sudo docker ps -a -q)
