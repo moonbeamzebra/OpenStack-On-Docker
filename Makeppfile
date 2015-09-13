@@ -1,0 +1,78 @@
+.PHONY: all
+all: install_uchiwa
+
+docker.t:
+    sudo apt-get update
+    sudo apt-get install -y facter
+    sudo apt-get install -y wget
+    wget -qO- https://get.docker.com/ | sh
+    sudo service docker restart
+    touch docker.t
+
+.PHONY: install_docker
+install_docker: 
+
+.PHONY: build_openstack_base
+build_openstack_base: install_docker
+    sudo makepp -C dockerfiles/openstack_base build_image
+
+.PHONY: build_mariadb
+build_mariadb: install_docker
+    sudo makepp -C dockerfiles/mariadb build_image
+
+.PHONY: install_mariadb
+install_mariadb: build_mariadb
+    sudo docker run -d -p 3306:3306 --name openstack-mariadb -e MYSQL_ROOT_PASSWORD=lab1 openstack-mariadb
+    sleep 15
+
+.PHONY: build_rabbitmq
+build_rabbitmq: install_docker
+    sudo makepp -C dockerfiles/rabbitmq build_image 
+
+.PHONY: install_rabbitmq
+install_rabbitmq: build_rabbitmq
+    sudo docker run -d -p 5672:5672 --name openstack-rabbitmq -e RABBIT_PASS=lab1 openstack-rabbitmq 
+
+.PHONY: build_keystone
+build_keystone: build_openstack_base
+    sudo makepp -C dockerfiles/keystone build_image
+
+.PHONY: install_keystone
+install_keystone: build_keystone install_mariadb
+    sudo docker run -d --name openstack-keystone -p 5000:5000 -p 35357:35357 -e KEYSTONEDBPASS=lab1 -e ROOTDBPASS=lab1 -e MYSQLHOST=openstack-mariadb --link openstack-mariadb openstack-keystone
+
+.PHONY: build_redis
+build_redis: install_docker
+#    sudo docker pull redis:3
+
+.PHONY: install_redis
+install_redis: build_redis
+    sudo docker run --name redis_service -d redis:3
+
+.PHONY: build_sensu_server
+build_sensu_server: install_docker
+    sudo makepp -C dockerfiles/sensu-server build_image
+
+.PHONY: install_sensu_server
+install_sensu_server: install_rabbitmq install_redis build_sensu_server 
+    sudo docker run --name sensu_server_service -p 4567:4567 --link rabbitmq_service --link redis_service -d sensu_server
+
+.PHONY: build_uchiwa
+build_uchiwa: install_docker
+#    sudo docker pull uchiwa/uchiwa
+
+.PHONY: install_uchiwa
+install_uchiwa: install_sensu_server build_uchiwa
+    docker run -d -p 80:3000 --name uchiwa_service --link sensu_server_service -v $(absolute_filename dockerfiles/uchiwa):/config uchiwa/uchiwa
+
+.PHONY: clean
+clean:
+    sudo docker stop $(shell sudo docker ps -a -q)
+    sudo docker rm $(shell sudo docker ps -a -q)
+
+.PHONY: purge
+purge: clean
+    sudo docker rmi $(shell sudo docker images -q)
+    sudo apt-get autoremove -y --purge lxc-docker
+    sudo rm docker.t
+    sudo rm -rf /var/lib/docker
