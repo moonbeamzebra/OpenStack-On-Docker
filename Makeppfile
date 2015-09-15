@@ -40,6 +40,15 @@ build_keystone: build_openstack_base
 .PHONY: install_keystone
 install_keystone: build_keystone install_mariadb
     sudo docker run -d --name openstack-keystone -p 5000:5000 -p 35357:35357 -e KEYSTONEDBPASS=lab1 -e ROOTDBPASS=lab1 -e MYSQLHOST=openstack-mariadb --link openstack-mariadb openstack-keystone
+    sleep 15
+
+.PHONY: build_horizon
+build_horizon: build_openstack_base
+    sudo makepp -C dockerfiles/horizon build_image
+
+.PHONY: install_horizon
+install_horizon: build_horizon install_keystone
+    sudo docker run -d --name openstack-horizon -p 8888:80  -e KEYSTONE_HOST=openstack-keystone -e ADMIN_PASS=lab1  --link openstack-keystone openstack-horizon
 
 .PHONY: clean
 clean:
