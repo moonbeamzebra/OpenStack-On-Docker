@@ -22,7 +22,7 @@ build_mariadb: install_docker
 
 .PHONY: install_mariadb
 install_mariadb: build_mariadb
-    sudo docker run -d -p 3306:3306 --name openstack-mariadb -e MYSQL_ROOT_PASSWORD=lab1 openstack-mariadb
+    sudo docker run -d -p 3306:3306 --hostname mariadb --name openstack-mariadb --env-file ./env.list openstack-mariadb
     sleep 15
 
 .PHONY: build_rabbitmq
@@ -31,7 +31,7 @@ build_rabbitmq: install_docker
 
 .PHONY: install_rabbitmq
 install_rabbitmq: build_rabbitmq
-    sudo docker run -d -p 5672:5672 --name openstack-rabbitmq -e RABBIT_PASS=lab1 openstack-rabbitmq 
+    sudo docker run -d -p 5672:5672 --name openstack-rabbitmq --env-file ./env.list openstack-rabbitmq 
 
 .PHONY: build_keystone
 build_keystone: build_openstack_base
@@ -39,8 +39,15 @@ build_keystone: build_openstack_base
 
 .PHONY: install_keystone
 install_keystone: build_keystone install_mariadb
-    sudo docker run -d --name openstack-keystone -p 5000:5000 -p 35357:35357 -e KEYSTONEDBPASS=lab1 -e ROOTDBPASS=lab1 -e MYSQLHOST=openstack-mariadb --link openstack-mariadb openstack-keystone
-    sleep 15
+    sudo docker run -d --hostname keystone \
+                       --name openstack-keystone \
+                       -p 5000:5000 \
+                       -p 35357:35357 \
+                       --env-file ./env.list \
+                       --link openstack-mariadb \
+                       openstack-keystone
+    sleep 40
+    sudo docker exec -it openstack-keystone bash ./init-keystone.sh
 
 .PHONY: build_horizon
 build_horizon: build_openstack_base
@@ -48,7 +55,7 @@ build_horizon: build_openstack_base
 
 .PHONY: install_horizon
 install_horizon: build_horizon install_keystone
-    sudo docker run -d --name openstack-horizon -p 8888:80  -e KEYSTONE_HOST=openstack-keystone -e ADMIN_PASS=lab1  --link openstack-keystone openstack-horizon
+    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone openstack-horizon
 
 .PHONY: clean
 clean:

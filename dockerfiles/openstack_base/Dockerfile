@@ -3,11 +3,13 @@ FROM ubuntu:14.04
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && apt-get install -y \
-	crudini \
-	curl \
-	mariadb-client
+        crudini \
+        curl \
+        mariadb-client-5.* \
+        python-mysqldb \
+        ubuntu-cloud-keyring
 
-RUN apt-get install ubuntu-cloud-keyring
 RUN echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" "trusty-updates/kilo main" > /etc/apt/sources.list.d/cloudarchive-kilo.list
-RUN apt-get update
 
+RUN apt-get update && apt-get install -y \
+    python-openstackclient

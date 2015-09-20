@@ -2,12 +2,10 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get install -y openssl
-
-ENV ADMIN_TOKEN=c2905bc8ce07a9cf066a
+ENV ADMIN_TOKEN=c2905bc8ce0fgfgf7a9cf066a
 
 RUN echo "manual" > /etc/init/keystone.override
-RUN apt-get install -y keystone python-openstackclient apache2 libapache2-mod-wsgi memcached python-memcache
+RUN apt-get install -y keystone apache2 libapache2-mod-wsgi memcached python-memcache
 
 RUN cp /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
 RUN crudini --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN
@@ -16,8 +14,6 @@ RUN crudini --set /etc/keystone/keystone.conf token provider keystone.token.prov
 RUN crudini --set /etc/keystone/keystone.conf token driver keystone.token.persistence.backends.memcache.Token
 RUN crudini --set /etc/keystone/keystone.conf revoke driver keystone.contrib.revoke.backends.sql.Revoke
 RUN crudini --set /etc/keystone/keystone.conf memcache servers localhost:11211
-
-RUN apt-get install python-mysqldb
 
 ADD wsgi-keystone.conf /etc/apache2/sites-available/wsgi-keystone.conf
 
@@ -38,8 +34,9 @@ RUN diff /etc/keystone/keystone-paste.ini /etc/keystone/keystone-paste.ini.bak
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh
+ADD init-keystone.sh init-keystone.sh
 
-RUN chmod +x run.sh && chmod +x setup.sh
+RUN chmod +x run.sh && chmod +x setup.sh && chmod +x init-keystone.sh
 
 EXPOSE 5000
 EXPOSE 35357

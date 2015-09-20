@@ -12,4 +12,5 @@ ADD setup.sh /tmp/setup.sh
 
 RUN chmod +x /tmp/setup.sh
 
+
 CMD /tmp/setup.sh && ./docker-entrypoint.sh mysqld

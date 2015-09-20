@@ -2,8 +2,7 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get install -y python-keystoneclient 
-RUN apt-get install -y openstack-dashboard
+RUN apt-get update && apt-get install -y openstack-dashboard
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh
