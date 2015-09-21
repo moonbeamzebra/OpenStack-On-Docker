@@ -49,6 +49,14 @@ install_keystone: build_keystone install_mariadb
     sleep 40
     sudo docker exec -it openstack-keystone bash ./init-keystone.sh
 
+.PHONY: build_openstack_clients
+build_openstack_clients: build_openstack_base
+    sudo makepp -C dockerfiles/openstack_clients build_image
+
+.PHONY: install_openstack_clients
+install_horizon: build_openstack_clients install_keystone
+    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone openstack-clients
+
 .PHONY: build_horizon
 build_horizon: build_openstack_base
     sudo makepp -C dockerfiles/horizon build_image
