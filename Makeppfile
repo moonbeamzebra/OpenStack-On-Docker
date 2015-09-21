@@ -46,24 +46,37 @@ install_keystone: build_keystone install_mariadb
                        --env-file ./env.list \
                        --link openstack-mariadb \
                        openstack-keystone
-    sleep 40
+    sleep 60
     sudo docker exec -it openstack-keystone bash ./init-keystone.sh
+
+PHONY: build_glance
+build_glance: build_openstack_base
+    sudo makepp -C dockerfiles/glance build_image
+
+.PHONY: install_glance
+install_glance: build_glance install_mariadb
+    sudo docker run -d --hostname glance \
+                       --name openstack-glance \
+                       -p 9292:9292 \
+                       --env-file ./env.list \
+                       --link openstack-mariadb \
+                       openstack-glance
 
 .PHONY: build_openstack_clients
 build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_horizon: build_openstack_clients install_keystone
-    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone openstack-clients
+install_openstack_clients: build_openstack_clients install_keystone install_glance
+    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance openstack-clients
 
 .PHONY: build_horizon
 build_horizon: build_openstack_base
     sudo makepp -C dockerfiles/horizon build_image
 
 .PHONY: install_horizon
-install_horizon: build_horizon install_keystone
-    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone openstack-horizon
+install_horizon: build_horizon install_keystone install_glance
+    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance openstack-horizon
 
 .PHONY: clean
 clean:

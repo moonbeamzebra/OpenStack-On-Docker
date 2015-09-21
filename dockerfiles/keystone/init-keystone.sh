@@ -53,6 +53,13 @@ source admin-openrc.sh
 openstack user create glance --password $GLANCE_PASS
 openstack role add --project service --user glance admin
 openstack service create --name glance --description "OpenStack Image service" image
+openstack endpoint create \
+--publicurl http://$GLANCE_HOST:9292 \
+--internalurl http://$GLANCE_HOST:9292 \
+--adminurl http://$GLANCE_HOST:9292 \
+--region $REGION1 \
+image
+
 openstack user create --password $NOVA_PASS nova
 openstack role add --project service --user nova admin
 openstack service create --name nova --description "OpenStack Compute" compute
