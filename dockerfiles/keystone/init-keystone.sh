@@ -63,6 +63,14 @@ image
 openstack user create --password $NOVA_PASS nova
 openstack role add --project service --user nova admin
 openstack service create --name nova --description "OpenStack Compute" compute
+openstack endpoint create \
+--publicurl http://$NOVA_HOST:8774/v2/%\(tenant_id\)s \
+--internalurl http://$NOVA_HOST:8774/v2/%\(tenant_id\)s \
+--adminurl http://$NOVA_HOST:8774/v2/%\(tenant_id\)s \
+--region $REGION1 \
+compute
+
+
 openstack user create --password $NEUTRON_PASS neutron
 openstack role add --project service --user neutron admin
 openstack service create --name neutron --description "OpenStack Networking" network

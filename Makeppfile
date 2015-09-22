@@ -10,7 +10,7 @@ docker.t:
     touch docker.t
 
 .PHONY: install_docker
-install_docker: 
+install_docker:
 
 .PHONY: build_openstack_base
 build_openstack_base: install_docker
@@ -27,11 +27,11 @@ install_mariadb: build_mariadb
 
 .PHONY: build_rabbitmq
 build_rabbitmq: install_docker
-    sudo makepp -C dockerfiles/rabbitmq build_image 
+    sudo makepp -C dockerfiles/rabbitmq build_image
 
 .PHONY: install_rabbitmq
 install_rabbitmq: build_rabbitmq
-    sudo docker run -d -p 5672:5672 --name openstack-rabbitmq --env-file ./env.list openstack-rabbitmq 
+    sudo docker run -d -p 5672:5672 --name openstack-rabbitmq --env-file ./env.list openstack-rabbitmq
 
 .PHONY: build_keystone
 build_keystone: build_openstack_base
@@ -62,13 +62,32 @@ install_glance: build_glance install_mariadb
                        --link openstack-mariadb \
                        openstack-glance
 
+
+PHONY: build_nova
+build_nova: build_openstack_base
+    sudo makepp -C dockerfiles/nova build_image
+
+# Use of privileged;  see https://github.com/docker/docker/issues/4424
+.PHONY: install_nova
+install_nova: build_nova install_mariadb install_glance install_rabbitmq
+    sudo docker run -d --hostname nova \
+                       --name openstack-nova \
+                       -privileged \
+                       -p 8774:8774 \
+                       --env-file ./env.list \
+                       --link openstack-mariadb \
+                       --link openstack-glance \
+                       --link openstack-rabbitmq \
+                       openstack-nova
+
+
 .PHONY: build_openstack_clients
 build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_openstack_clients: build_openstack_clients install_keystone install_glance
-    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance openstack-clients
+install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova
+    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova openstack-clients
 
 .PHONY: build_horizon
 build_horizon: build_openstack_base
@@ -76,7 +95,7 @@ build_horizon: build_openstack_base
 
 .PHONY: install_horizon
 install_horizon: build_horizon install_keystone install_glance
-    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance openstack-horizon
+    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova openstack-horizon
 
 .PHONY: clean
 clean:
