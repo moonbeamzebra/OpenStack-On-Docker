@@ -22,6 +22,17 @@ RUN crudini --set /etc/nova/nova.conf keystone_authtoken username nova
 RUN crudini --set /etc/nova/nova.conf DEFAULT verbose True
 RUN crudini --set /etc/nova/nova.conf oslo_concurrency lock_path /var/lock/nova
 
+RUN crudini --set /etc/nova/nova.conf DEFAULT network_api_class nova.network.neutronv2.api.API
+RUN crudini --set /etc/nova/nova.conf DEFAULT security_group_api neutron
+RUN crudini --set /etc/nova/nova.conf DEFAULT linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
+RUN crudini --set /etc/nova/nova.conf DEFAULT firewall_driver nova.virt.firewall.NoopFirewallDriver
+RUN crudini --set /etc/nova/nova.conf neutron auth_strategy keystone
+RUN crudini --set /etc/nova/nova.conf neutron admin_tenant_name service
+RUN crudini --set /etc/nova/nova.conf neutron admin_username neutron
+
+RUN crudini --set /etc/nova/nova.conf neutron service_metadata_proxy True
+
+
 ADD run.sh run.sh
 ADD setup.sh setup.sh
 

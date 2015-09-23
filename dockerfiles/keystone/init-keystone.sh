@@ -74,6 +74,16 @@ compute
 openstack user create --password $NEUTRON_PASS neutron
 openstack role add --project service --user neutron admin
 openstack service create --name neutron --description "OpenStack Networking" network
+openstack endpoint create \
+--publicurl http://$NEUTRON_HOST:9696 \
+--adminurl http://$NEUTRON_HOST:9696 \
+--internalurl http://$NEUTRON_HOST:9696 \
+--region $REGION1 \
+network
+
+
+
+
 openstack user create --password $HEAT_PASS heat
 openstack role add --project service --user heat admin
 openstack role create heat_stack_owner

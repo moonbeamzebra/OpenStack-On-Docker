@@ -81,21 +81,39 @@ install_nova: build_nova install_mariadb install_glance install_rabbitmq
                        openstack-nova
 
 
+PHONY: build_neutron
+build_neutron: build_openstack_base
+    sudo makepp -C dockerfiles/neutron build_image
+
+# see:
+# https://blog.sebastian-daschner.com/entries/docker0_network_connection
+# http://stackoverflow.com/questions/27563460/let-two-containers-getting-linked-to-eachother
+.PHONY: install_neutron
+install_neutron: build_neutron install_mariadb install_nova install_rabbitmq
+    sudo docker run -d --hostname neutron \
+                       --name openstack-neutron \
+                       -p 9696:9696 \
+                       --env-file ./env.list \
+                       --link openstack-mariadb \
+                       --link openstack-nova \
+                       --link openstack-rabbitmq \
+                       openstack-neutron
+
 .PHONY: build_openstack_clients
 build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova
-    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova openstack-clients
+install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron
+    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova --link openstack-neutron openstack-clients
 
 .PHONY: build_horizon
 build_horizon: build_openstack_base
     sudo makepp -C dockerfiles/horizon build_image
 
 .PHONY: install_horizon
-install_horizon: build_horizon install_keystone install_glance
-    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova openstack-horizon
+install_horizon: build_horizon install_keystone install_glance install_nova install_neutron
+    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova --link openstack-neutron openstack-horizon
 
 .PHONY: clean
 clean:

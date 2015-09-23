@@ -16,6 +16,12 @@ crudini --set /etc/nova/nova.conf DEFAULT vncserver_listen $NOVA_HOST
 crudini --set /etc/nova/nova.conf DEFAULT vncserver_proxyclient_address $NOVA_HOST
 crudini --set /etc/nova/nova.conf glance host $GLANCE_HOST
 
+crudini --set /etc/nova/nova.conf neutron url http://$NEUTRON_HOST:9696
+crudini --set /etc/nova/nova.conf neutron admin_auth_url http://$KEYSTONE_HOST:35357/v2.0
+crudini --set /etc/nova/nova.conf neutron admin_password $NEUTRON_PASS
+
+crudini --set /etc/nova/nova.conf neutron metadata_proxy_shared_secret $NEUTRON_PASS
+
 sleep 5
 
 su -s /bin/sh -c "nova-manage db sync" nova
