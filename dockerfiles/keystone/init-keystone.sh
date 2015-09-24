@@ -91,6 +91,21 @@ openstack role add --project demo --user demo heat_stack_owner
 openstack role create heat_stack_user
 openstack service create --name heat --description "Orchestration" orchestration
 openstack service create --name heat-cfn --description "Orchestration" cloudformation
+openstack endpoint create \
+--publicurl http://$HEAT_HOST:8004/v1/%\(tenant_id\)s \
+--internalurl http://$HEAT_HOST:8004/v1/%\(tenant_id\)s \
+--adminurl http://$HEAT_HOST:8004/v1/%\(tenant_id\)s \
+--region $REGION1 \
+orchestration
+
+openstack endpoint create \
+--publicurl http://$HEAT_HOST:8000/v1 \
+--internalurl http://$HEAT_HOST:8000/v1 \
+--adminurl http://$HEAT_HOST:8000/v1 \
+--region $REGION1 \
+cloudformation
+
+
 openstack user create --password $CEIL_PASS ceilometer
 openstack role add --project service --user ceilometer admin
 openstack service create --name ceilometer --description "Telemetry" metering

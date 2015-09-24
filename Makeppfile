@@ -44,9 +44,8 @@ install_keystone: build_keystone install_mariadb
                        -p 5000:5000 \
                        -p 35357:35357 \
                        --env-file ./env.list \
-                       --link openstack-mariadb \
                        openstack-keystone
-    sleep 60
+    sleep 120
     sudo docker exec -it openstack-keystone bash ./init-keystone.sh
 
 PHONY: build_glance
@@ -59,7 +58,6 @@ install_glance: build_glance install_mariadb
                        --name openstack-glance \
                        -p 9292:9292 \
                        --env-file ./env.list \
-                       --link openstack-mariadb \
                        openstack-glance
 
 
@@ -75,9 +73,6 @@ install_nova: build_nova install_mariadb install_glance install_rabbitmq
                        -privileged \
                        -p 8774:8774 \
                        --env-file ./env.list \
-                       --link openstack-mariadb \
-                       --link openstack-glance \
-                       --link openstack-rabbitmq \
                        openstack-nova
 
 
@@ -94,18 +89,28 @@ install_neutron: build_neutron install_mariadb install_nova install_rabbitmq
                        --name openstack-neutron \
                        -p 9696:9696 \
                        --env-file ./env.list \
-                       --link openstack-mariadb \
-                       --link openstack-nova \
-                       --link openstack-rabbitmq \
                        openstack-neutron
+
+PHONY: build_heat
+build_heat: build_openstack_base
+    sudo makepp -C dockerfiles/heat build_image
+
+.PHONY: install_heat
+install_heat: build_heat install_mariadb install_rabbitmq
+    sudo docker run -d --hostname heat \
+                       --name openstack-heat \
+                       -p 8000:8000 \
+                       -p 8004:8004 \
+                       --env-file ./env.list \
+                       openstack-heat
 
 .PHONY: build_openstack_clients
 build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron
-    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova --link openstack-neutron openstack-clients
+install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron install_heat
+    sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  openstack-clients
 
 .PHONY: build_horizon
 build_horizon: build_openstack_base
@@ -113,7 +118,7 @@ build_horizon: build_openstack_base
 
 .PHONY: install_horizon
 install_horizon: build_horizon install_keystone install_glance install_nova install_neutron
-    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  --link openstack-keystone --link openstack-glance --link openstack-nova --link openstack-neutron openstack-horizon
+    sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  openstack-horizon
 
 .PHONY: clean
 clean:

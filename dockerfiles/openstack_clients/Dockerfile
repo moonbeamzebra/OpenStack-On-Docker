@@ -2,7 +2,8 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-RUN apt-get update && apt-get -y install ssh
+RUN apt-get update && apt-get -y install ssh \
+                                         python-heatclient
 
 ADD setup.sh setup.sh
 ADD run.sh run.sh
