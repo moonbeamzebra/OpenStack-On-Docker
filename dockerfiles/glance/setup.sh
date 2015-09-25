@@ -2,7 +2,7 @@
 echo "CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCE_DBPASS';
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'%' IDENTIFIED BY '$GLANCE_DBPASS';
-FLUSH PRIVILEGES;" | mysql --user=root --password=$ROOTDBPASS -h $MYSQLHOST -P 3306
+FLUSH PRIVILEGES;" | mysql --user=root --password=$MYSQL_ROOT_PASSWORD -h $MYSQLHOST -P 3306
 
 crudini --set /etc/glance/glance-api.conf database connection mysql://glance:$GLANCE_DBPASS@$MYSQLHOST/glance 
 crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_uri http://$KEYSTONE_HOST:5000

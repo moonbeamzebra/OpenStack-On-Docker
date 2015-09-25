@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y heat-api \
 
 RUN cp /etc/heat/heat.conf /etc/heat/heat.conf.bak
 RUN crudini --set /etc/heat/heat.conf DEFAULT rpc_backend rabbit
-RUN crudini --set /etc/heat/heat.conf oslo_messaging_rabbit rabbit_userid openstack
 RUN crudini --set /etc/heat/heat.conf keystone_authtoken admin_tenant_name service
 RUN crudini --set /etc/heat/heat.conf keystone_authtoken admin_user heat
 RUN crudini --set /etc/heat/heat.conf DEFAULT verbose True

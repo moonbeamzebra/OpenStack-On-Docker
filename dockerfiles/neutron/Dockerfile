@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y neutron-server \
 
 RUN cp /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bak
 RUN crudini --set /etc/neutron/neutron.conf DEFAULT rpc_backend rabbit
-RUN crudini --set /etc/neutron/neutron.conf oslo_messaging_rabbit rabbit_userid openstack
 RUN crudini --set /etc/neutron/neutron.conf DEFAULT auth_strategy keystone
 RUN crudini --set /etc/neutron/neutron.conf keystone_authtoken auth_plugin password
 RUN crudini --set /etc/neutron/neutron.conf keystone_authtoken project_domain_id default
