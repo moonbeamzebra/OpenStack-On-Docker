@@ -37,13 +37,15 @@ install_mariadb: build_mariadb
 install_rabbitmq: 
     sudo docker run -d -p 5672:5672 --hostname rabbitmq --env-file ./env.list  --name openstack-rabbitmq rabbitmq:3
 
-PHONY: build_mongodb
+.PHONY: build_mongodb
 build_mongodb: install_docker
     sudo makepp -C dockerfiles/mongodb build_image
 
 .PHONY: install_mongodb
 install_mongodb: build_mongodb
     sudo docker run -d -p 27017:27017 --hostname mongodb --env-file ./env.list  --name openstack-mongodb openstack-mongodb
+    sleep 60
+    sudo docker exec -it openstack-mongodb bash ./init.sh
 
 
 .PHONY: build_keystone
@@ -59,14 +61,14 @@ install_keystone: build_keystone install_mariadb
                        --env-file ./env.list \
                        openstack-keystone
     sleep 120
-    sudo docker exec -it openstack-keystone bash ./init-keystone.sh
+    sudo docker exec -it openstack-keystone bash ./init.sh
 
 PHONY: build_glance
 build_glance: build_openstack_base
     sudo makepp -C dockerfiles/glance build_image
 
 .PHONY: install_glance
-install_glance: build_glance install_mariadb
+install_glance: build_glance install_mariadb install_rabbitmq install_keystone
     sudo docker run -d --hostname glance \
                        --name openstack-glance \
                        -p 9292:9292 \
@@ -80,7 +82,7 @@ build_nova: build_openstack_base
 
 # Use of privileged;  see https://github.com/docker/docker/issues/4424
 .PHONY: install_nova
-install_nova: build_nova install_mariadb install_glance install_rabbitmq
+install_nova: build_nova install_mariadb install_glance install_rabbitmq install_keystone
     sudo docker run -d --hostname nova \
                        --name openstack-nova \
                        -privileged \
@@ -97,19 +99,19 @@ build_neutron: build_openstack_base
 # https://blog.sebastian-daschner.com/entries/docker0_network_connection
 # http://stackoverflow.com/questions/27563460/let-two-containers-getting-linked-to-eachother
 .PHONY: install_neutron
-install_neutron: build_neutron install_mariadb install_nova install_rabbitmq
+install_neutron: build_neutron install_mariadb install_nova install_rabbitmq install_keystone
     sudo docker run -d --hostname neutron \
                        --name openstack-neutron \
                        -p 9696:9696 \
                        --env-file ./env.list \
                        openstack-neutron
 
-PHONY: build_heat
+.PHONY: build_heat
 build_heat: build_openstack_base
     sudo makepp -C dockerfiles/heat build_image
 
 .PHONY: install_heat
-install_heat: build_heat install_mariadb install_rabbitmq
+install_heat: build_heat install_mariadb install_rabbitmq install_keystone
     sudo docker run -d --hostname heat \
                        --name openstack-heat \
                        -p 8000:8000 \
@@ -117,12 +119,24 @@ install_heat: build_heat install_mariadb install_rabbitmq
                        --env-file ./env.list \
                        openstack-heat
 
+.PHONY: build_ceilometer
+build_ceilometer: build_openstack_base
+    sudo makepp -C dockerfiles/ceilometer build_image
+
+.PHONY: install_ceilometer
+install_ceilometer: build_ceilometer install_rabbitmq install_mongodb install_keystone
+    sudo docker run -d --hostname ceilometer \
+                       --name openstack-ceilometer \
+                       -p 8777:8777 \
+                       --env-file ./env.list \
+                       openstack-ceilometer
+
 .PHONY: build_openstack_clients
 build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron install_heat
+install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron install_heat install_ceilometer
     sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  openstack-clients
 
 .PHONY: build_horizon

@@ -34,9 +34,9 @@ RUN diff /etc/keystone/keystone-paste.ini /etc/keystone/keystone-paste.ini.bak
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh
-ADD init-keystone.sh init-keystone.sh
+ADD init.sh init.sh
 
-RUN chmod +x run.sh && chmod +x setup.sh && chmod +x init-keystone.sh
+RUN chmod +x run.sh && chmod +x setup.sh && chmod +x init.sh
 
 EXPOSE 5000
 EXPOSE 35357

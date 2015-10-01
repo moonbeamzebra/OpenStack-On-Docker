@@ -14,8 +14,9 @@ RUN echo "smallfiles = true" >> /etc/mongodb.conf
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh
+ADD init.sh init.sh
 
-RUN chmod +x run.sh && chmod +x setup.sh
+RUN chmod +x run.sh && chmod +x setup.sh && chmod +x init.sh
 
 EXPOSE 27017
 

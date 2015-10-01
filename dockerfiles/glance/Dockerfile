@@ -17,6 +17,10 @@ RUN crudini --set /etc/glance/glance-api.conf glance_store filesystem_store_data
 RUN crudini --set /etc/glance/glance-api.conf DEFAULT notification_driver noop
 RUN crudini --set /etc/glance/glance-api.conf DEFAULT verbose True
 
+RUN crudini --set /etc/glance/glance-api.conf DEFAULT notification_driver messagingv2
+RUN crudini --set /etc/glance/glance-api.conf DEFAULT rpc_backend rabbit
+RUN crudini --set /etc/glance/glance-api.conf oslo_messaging_rabbit rabbit_userid openstack
+
 RUN cp /etc/glance/glance-registry.conf  /etc/glance/glance-registry.conf.bak
 RUN crudini --set /etc/glance/glance-registry.conf keystone_authtoken auth_plugin password
 RUN crudini --set /etc/glance/glance-registry.conf keystone_authtoken project_domain_id default
@@ -26,6 +30,10 @@ RUN crudini --set /etc/glance/glance-registry.conf keystone_authtoken username g
 RUN crudini --set /etc/glance/glance-registry.conf paste_deploy flavor keystone
 RUN crudini --set /etc/glance/glance-registry.conf DEFAULT notification_driver noop
 RUN crudini --set /etc/glance/glance-registry.conf DEFAULT verbose True
+
+RUN crudini --set /etc/glance/glance-registry.conf DEFAULT notification_driver messagingv2
+RUN crudini --set /etc/glance/glance-registry.conf DEFAULT rpc_backend rabbit
+RUN crudini --set /etc/glance/glance-registry.conf oslo_messaging_rabbit rabbit_userid openstack
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh

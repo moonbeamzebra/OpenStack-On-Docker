@@ -3,7 +3,8 @@ FROM openstack-base
 ENV DEBIAN_FRONTEND noninteractive 
 
 RUN apt-get update && apt-get -y install ssh \
-                                         python-heatclient
+                                         python-heatclient \
+					 python-ceilometerclient
 
 ADD setup.sh setup.sh
 ADD run.sh run.sh

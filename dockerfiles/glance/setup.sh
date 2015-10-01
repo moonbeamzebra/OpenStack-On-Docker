@@ -9,10 +9,16 @@ crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_uri http://$KE
 crudini --set /etc/glance/glance-api.conf keystone_authtoken auth_url http://$KEYSTONE_HOST:35357
 crudini --set /etc/glance/glance-api.conf keystone_authtoken password $GLANCE_PASS
 
+crudini --set /etc/glance/glance-api.conf oslo_messaging_rabbit rabbit_host $RABBIT_HOST
+crudini --set /etc/glance/glance-api.conf oslo_messaging_rabbit rabbit_password $RABBITMQ_DEFAULT_PASS
+
 crudini --set /etc/glance/glance-registry.conf database connection mysql://glance:$GLANCE_DBPASS@$MYSQLHOST/glance
 crudini --set /etc/glance/glance-registry.conf keystone_authtoken auth_uri http://$KEYSTONE_HOST:5000
 crudini --set /etc/glance/glance-registry.conf keystone_authtoken auth_url http://$KEYSTONE_HOST:35357
 crudini --set /etc/glance/glance-registry.conf keystone_authtoken password $GLANCE_PASS
+
+crudini --set /etc/glance/glance-registry.conf oslo_messaging_rabbit rabbit_host $RABBIT_HOST
+crudini --set /etc/glance/glance-registry.conf oslo_messaging_rabbit rabbit_password $RABBITMQ_DEFAULT_PASS
 
 sleep 5
 
