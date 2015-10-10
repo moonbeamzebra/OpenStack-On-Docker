@@ -106,14 +106,14 @@ openstack endpoint create \
 cloudformation
 
 
-openstack user create --password $CEIL_PASS ceilometer
-openstack role add --project service --user ceilometer admin
-openstack service create --name ceilometer --description "Telemetry" metering
+#openstack user create --password $CEIL_PASS ceilometer
+#openstack role add --project service --user ceilometer admin
+#openstack service create --name ceilometer --description "Telemetry" metering
 
-openstack endpoint create \
---publicurl http://$CEIL_HOST:8777 \
---internalurl http://$CEIL_HOST:8777 \
---adminurl http://$CEIL_HOST:8777 \
---region $REGION1 \
-metering
+#openstack endpoint create \
+#--publicurl http://$CEIL_HOST:8777 \
+#--internalurl http://$CEIL_HOST:8777 \
+#--adminurl http://$CEIL_HOST:8777 \
+#--region $REGION1 \
+#metering
 

@@ -136,7 +136,7 @@ build_openstack_clients: build_openstack_base
     sudo makepp -C dockerfiles/openstack_clients build_image
 
 .PHONY: install_openstack_clients
-install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron install_heat install_ceilometer
+install_openstack_clients: build_openstack_clients install_keystone install_glance install_nova install_neutron install_heat
     sudo docker run -d --hostname openstack-clients -p 22222:22 --name openstack-clients --env-file ./env.list  openstack-clients
 
 .PHONY: build_horizon
