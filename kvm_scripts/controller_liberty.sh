@@ -102,7 +102,7 @@ read -p "press return..."
 cp /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
 crudini --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN
 crudini --set /etc/keystone/keystone.conf DEFAULT verbose True
-crudini --set /etc/keystone/keystone.conf connection connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$MYSQLHOST/keystone
+crudini --set /etc/keystone/keystone.conf database connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$MYSQLHOST/keystone
 crudini --set /etc/keystone/keystone.conf token provider uuid
 crudini --set /etc/keystone/keystone.conf token driver memcache
 crudini --set /etc/keystone/keystone.conf revoke driver sql
