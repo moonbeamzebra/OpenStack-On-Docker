@@ -7,7 +7,6 @@ GLANCE_DBPASS=glancedb1
 NOVA_DBPASS=novadb1
 NEUTRON_DBPASS=neutrondb1
 HEAT_DBPASS=heatdb1
-ADMIN_TOKEN=c2905bc6734fg6798a9cf066a
 ADMIN_PASS=osu1
 RABBITMQ_DEFAULT_USER=openstack
 RABBITMQ_DEFAULT_PASS=rabbit1
@@ -37,10 +36,17 @@ NET_PUBLIC_INTERFACE_NAME=eth1
 apt-get install software-properties-common -y
 add-apt-repository cloud-archive:liberty -y
 
-apt-get update && apt-get dist-upgrade -y
+read -p "press return..."
+
+#apt-get update && apt-get dist-upgrade -y
+apt-get update -y
 apt-get -y install crudini curl
 
+read -p "press return..."
+
 apt-get install -y python-openstackclient mariadb-client-5.* python-mysqldb
+
+read -p "press return..."
 
 ## Setup mysql
 
@@ -71,6 +77,7 @@ sleep 5
 
 service rabbitmq-server restart
 
+read -p "press return..."
 
 ## Set up keystone
 echo "CREATE DATABASE keystone;
@@ -78,13 +85,19 @@ GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$KEY
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$KEYSTONE_DBPASS';
 FLUSH PRIVILEGES;" | mysql --user=root --password=$MYSQL_ROOT_PASSWORD -h $MYSQLHOST -P 3306
 
+read -p "press return..."
+
 apt-get install -y openssl
-#ADMIN_TOKEN=$(openssl rand -hex 10)
+ADMIN_TOKEN=$(openssl rand -hex 10)
 echo "Admin token: $ADMIN_TOKEN"
+
+read -p "press return..."
 
 echo "manual" > /etc/init/keystone.override
 
 apt-get install -y keystone apache2 libapache2-mod-wsgi memcached python-memcache
+
+read -p "press return..."
 
 cp /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
 crudini --set /etc/keystone/keystone.conf DEFAULT admin_token $ADMIN_TOKEN
@@ -97,8 +110,11 @@ crudini --set /etc/keystone/keystone.conf memcache servers localhost:11211
 diff /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
 
 sleep 5
+read -p "press return..."
 
 su -s /bin/sh -c "keystone-manage db_sync" keystone
+
+read -p "press return..."
 
 cat <<EOF > /etc/apache2/sites-available/wsgi-keystone.conf
 Listen 5000
@@ -153,10 +169,14 @@ EOF
 
 ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
 
+read -p "press return..."
+
 service apache2 restart
 rm -f /var/lib/keystone/keystone.db
 
+
 sleep 5
+read -p "press return..."
 
 export OS_TOKEN=$ADMIN_TOKEN
 export OS_URL=http://$KEYSTONE_HOST:35357/v3
@@ -164,6 +184,9 @@ export OS_IDENTITY_API_VERSION=3
 
 openstack service create \
   --name keystone --description "OpenStack Identity" identity
+
+read -p "press return..."
+  
 openstack endpoint create --region $REGION1 \
   identity public http://$KEYSTONE_HOST:5000/v2.0
 openstack endpoint create --region $REGION1 \
