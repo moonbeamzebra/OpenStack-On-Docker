@@ -1,6 +1,7 @@
 FROM mariadb:5
 
 RUN sed -i "/\[mysqld\]/a \
+bind-address = 0.0.0.0\n\
 default-storage-engine = innodb\n\
 innodb_file_per_table\n\
 collation-server = utf8_general_ci\n\
