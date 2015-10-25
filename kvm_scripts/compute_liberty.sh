@@ -111,7 +111,7 @@ EOF
 
 sysctl -p
 
-apt-get install neutron-plugin-linuxbridge-agent
+apt-get install -y neutron-plugin-linuxbridge-agent
 
 cp /etc/neutron/neutron.conf  /etc/neutron/neutron.conf .bak
 crudini --set /etc/neutron/neutron.conf DEFAULT rpc_backend rabbit
