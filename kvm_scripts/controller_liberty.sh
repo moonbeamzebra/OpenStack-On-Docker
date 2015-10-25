@@ -36,17 +36,14 @@ NET_PUBLIC_INTERFACE_NAME=eth1
 apt-get install software-properties-common -y
 add-apt-repository cloud-archive:liberty -y
 
-read -p "press return..."
 
 #apt-get update && apt-get dist-upgrade -y
 apt-get update -y
 apt-get -y install crudini curl
 
-read -p "press return..."
 
 apt-get install -y python-openstackclient mariadb-client-5.* python-mysqldb
 
-read -p "press return..."
 
 ## Setup mysql
 
@@ -77,7 +74,6 @@ sleep 5
 
 service rabbitmq-server restart
 
-read -p "press return..."
 
 ## Set up keystone
 echo "CREATE DATABASE keystone;
@@ -345,7 +341,7 @@ crudini --set /etc/nova/nova.conf database connection mysql+pymysql://nova:$NOVA
 crudini --set /etc/nova/nova.conf DEFAULT rpc_backend rabbit
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_host $RABBIT_HOST
 crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_userid $RABBITMQ_DEFAULT_USER
-crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+crudini --set /etc/nova/nova.conf oslo_messaging_rabbit rabbit_password $RABBITMQ_DEFAULT_PASS
 
 crudini --set /etc/nova/nova.conf DEFAULT auth_strategy keystone
 crudini --set /etc/nova/nova.conf keystone_authtoken auth_uri http://$KEYSTONE_HOST:5000
@@ -440,7 +436,7 @@ apt-get install -y neutron-server \
   python-neutronclient
 
 cp /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bak
-crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:$NEUTRON_DBPASS@MYSQLHOST/neutron
+crudini --set /etc/neutron/neutron.conf database connection mysql+pymysql://neutron:$NEUTRON_DBPASS@$MYSQLHOST/neutron
 crudini --set /etc/neutron/neutron.conf DEFAULT core_plugin ml2
 crudini --set /etc/neutron/neutron.conf DEFAULT service_plugins ""
 crudini --set /etc/neutron/neutron.conf DEFAULT rpc_backend rabbit
