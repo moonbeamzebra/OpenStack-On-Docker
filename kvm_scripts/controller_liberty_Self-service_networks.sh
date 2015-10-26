@@ -480,7 +480,6 @@ sleep 5
 cp /etc/neutron/plugins/ml2/linuxbridge_agent.ini /etc/neutron/plugins/ml2/linuxbridge_agent.ini.bak
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini linux_bridge physical_interface_mappings public:$NET_PUBLIC_INTERFACE_NAME
 
-[vxlan]
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan enable_vxlan True
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan local_ip $NET_OVERLAY_INTERFACE_IP_ADDRESS
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population True
