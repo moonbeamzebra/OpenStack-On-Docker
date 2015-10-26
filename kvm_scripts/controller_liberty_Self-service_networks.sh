@@ -545,7 +545,7 @@ service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 
 # option 2
-#service neutron-l3-agent restart
+service neutron-l3-agent restart
 
 
 apt-get install -y openstack-dashboard
