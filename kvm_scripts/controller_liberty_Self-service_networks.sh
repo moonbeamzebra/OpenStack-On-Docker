@@ -483,7 +483,7 @@ crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini linux_bridge physic
 [vxlan]
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan enable_vxlan True
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan local_ip $NET_OVERLAY_INTERFACE_IP_ADDRESS
-crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population = True
+crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini vxlan l2_population True
 
 crudini --set /etc/neutron/plugins/ml2/linuxbridge_agent.ini agent prevent_arp_spoofing True
 
