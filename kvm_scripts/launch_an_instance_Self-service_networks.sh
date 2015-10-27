@@ -10,6 +10,16 @@ glance image-create \
 --visibility public \
 --progress
 
+wget -P /tmp/images http://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+
+glance image-create \
+--name "trusty-server" \
+--file /tmp/images/trusty-server-cloudimg-amd64-disk1.img \
+--disk-format qcow2 \
+--container-format bare \
+--visibility public \
+--progress
+
 glance image-list
 
 source admin-openrc.sh
@@ -68,7 +78,7 @@ nova boot \
 public-instance
 
 
-# PUBLIC INSTANCE
+# PRIVATE INSTANCE
 nova boot \
 --flavor m1.tiny \
 --image cirros \
@@ -82,3 +92,19 @@ neutron floatingip-create public
 nova floating-ip-associate private-instance {FLOATING_IP}
 
 nova list
+
+# PRIVATE INSTANCE (Ubuntu)
+nova boot \
+--flavor m1.small \
+--image trusty-server \
+--nic net-id=$(neutron net-show -f value -F id private) \
+--security-group ALL \
+--key-name mykey \
+private-instance-u
+
+neutron floatingip-create public
+
+nova floating-ip-associate private-instance-u {FLOATING_IP}
+
+nova list
+
