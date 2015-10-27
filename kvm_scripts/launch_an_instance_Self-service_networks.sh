@@ -77,4 +77,8 @@ nova boot \
 --key-name mykey \
 private-instance
 
+neutron floatingip-create public
 
+nova floating-ip-associate private-instance {FLOATING_IP}
+
+nova list
