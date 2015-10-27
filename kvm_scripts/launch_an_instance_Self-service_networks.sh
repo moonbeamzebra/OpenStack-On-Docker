@@ -20,11 +20,26 @@ neutron net-create public \
 --provider:network_type flat
 
 
+
 neutron subnet-create public 10.199.5.0/24 \
 --name public \
 --allocation-pool start=10.199.5.160,end=10.199.5.169 \
---disable-dhcp \
+--dns-nameserver 8.8.8.8 \
 --gateway 10.199.5.1
+
+neutron net-update public --router:external
+
+source demo-openrc.sh
+
+neutron net-create private
+
+neutron subnet-create private 172.16.1.0/24 --name private --gateway 172.16.1.1
+
+neutron router-create router
+
+neutron router-interface-add router private
+
+neutron router-gateway-set router public
 
 
 source demo-openrc.sh
@@ -42,6 +57,8 @@ nova keypair-list
 nova flavor-list
 nova image-list
 
+
+# PUBLIC INSTANCE
 nova boot \
 --flavor m1.tiny \
 --image cirros \
@@ -51,32 +68,13 @@ nova boot \
 public-instance
 
 
-
-source demo-openrc.sh
-
-neutron net-create demo-net
-
-neutron subnet-create \
-demo-net 192.168.1.0/24 \
---name demo-subnet \
---gateway 192.168.1.1
-
-neutron router-create demo-router
-
-neutron router-interface-add demo-router demo-subnet
-
-neutron router-gateway-set demo-router ext-net
-
-nova keypair-list
-nova flavor-list
-nova image-list
-neutron net-list
-nova secgroup-list
-
+# PUBLIC INSTANCE
 nova boot \
 --flavor m1.tiny \
---image f0c06a1f-f0bd-46ef-9845-5ff1723e7f03 \
---nic net-id=f71937aa-fea1-465f-8ace-d4f03b0ef0cc \
+--image cirros \
+--nic net-id=$(neutron net-show -f value -F id private) \
 --security-group ALL \
---key-name osu_at_api01 \
-c1
+--key-name mykey \
+private-instance
+
+
