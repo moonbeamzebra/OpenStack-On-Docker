@@ -366,9 +366,8 @@ crudini --set /etc/nova/nova.conf neutron region_name $REGION1
 crudini --set /etc/nova/nova.conf neutron project_name service
 crudini --set /etc/nova/nova.conf neutron username neutron
 crudini --set /etc/nova/nova.conf neutron password $NEUTRON_PASS
-
-service_metadata_proxy = True
-metadata_proxy_shared_secret = METADATA_SECRET
+crudini --set /etc/nova/nova.conf neutron service_metadata_proxy True
+crudini --set /etc/nova/nova.conf neutron metadata_proxy_shared_secret $METADATA_SECRET
 
 diff /etc/nova/nova.conf /etc/nova/nova.conf.bak
 
