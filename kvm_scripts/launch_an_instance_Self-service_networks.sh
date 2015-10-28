@@ -1,4 +1,4 @@
-source admin-openrc.sh
+source ~/admin-openrc.sh
 
 wget -P /tmp/images http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
 
@@ -22,8 +22,6 @@ glance image-create \
 
 glance image-list
 
-source admin-openrc.sh
-
 neutron net-create public \
 --shared \
 --provider:physical_network public \
@@ -33,13 +31,13 @@ neutron net-create public \
 
 neutron subnet-create public 10.199.5.0/24 \
 --name public \
---allocation-pool start=10.199.5.160,end=10.199.5.169 \
+--allocation-pool start=10.199.5.60,end=10.199.5.67 \
 --dns-nameserver 8.8.8.8 \
 --gateway 10.199.5.1
 
 neutron net-update public --router:external
 
-source demo-openrc.sh
+source ~/demo-openrc.sh
 
 neutron net-create private
 
@@ -51,11 +49,8 @@ neutron router-interface-add router private
 
 neutron router-gateway-set router public
 
-
-source demo-openrc.sh
-
 ssh-keygen -q -N ""
-nova keypair-add --pub-key .ssh/id_rsa.pub mykey
+nova keypair-add --pub-key ~/.ssh/id_rsa.pub mykey
 
 nova secgroup-create ALL "ALL ingress"
 nova secgroup-add-rule ALL icmp -1 -1 0.0.0.0/0
@@ -69,13 +64,13 @@ nova image-list
 
 
 # PUBLIC INSTANCE
-nova boot \
---flavor m1.tiny \
---image cirros \
---nic net-id=$(neutron net-show -f value -F id public),v4-fixed-ip=10.199.5.165 \
---security-group ALL \
---key-name mykey \
-public-instance
+#nova boot \
+#--flavor m1.tiny \
+#--image cirros \
+#--nic net-id=$(neutron net-show -f value -F id public) \
+#--security-group ALL \
+#--key-name mykey \
+#public-instance
 
 
 # PRIVATE INSTANCE
@@ -89,7 +84,7 @@ private-instance
 
 neutron floatingip-create public
 
-nova floating-ip-associate private-instance {FLOATING_IP}
+#nova floating-ip-associate private-instance {FLOATING_IP}
 
 nova list
 
@@ -104,7 +99,7 @@ private-instance-u
 
 neutron floatingip-create public
 
-nova floating-ip-associate private-instance-u {FLOATING_IP}
+#nova floating-ip-associate private-instance-u {FLOATING_IP}
 
 nova list
 
