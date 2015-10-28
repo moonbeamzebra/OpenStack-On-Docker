@@ -506,10 +506,10 @@ crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver neutron.agent
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dhcp_driver neutron.agent.linux.dhcp.Dnsmasq
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT enable_isolated_metadata True
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT verbose True
-crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
+#crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
 diff /etc/neutron/dhcp_agent.ini  /etc/neutron/dhcp_agent.ini.bak
 
-echo "dhcp-option-force=26,1450" > /etc/neutron/dnsmasq-neutron.conf
+#echo "dhcp-option-force=26,1450" > /etc/neutron/dnsmasq-neutron.conf
 
 sleep 5
 
