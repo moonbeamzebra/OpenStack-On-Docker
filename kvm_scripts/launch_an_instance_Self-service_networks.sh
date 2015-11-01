@@ -31,7 +31,7 @@ neutron net-create public \
 
 neutron subnet-create public 10.199.5.0/24 \
 --name public \
---allocation-pool start=10.199.5.60,end=10.199.5.67 \
+--allocation-pool start=10.199.5.80,end=10.199.5.89 \
 --dns-nameserver 8.8.8.8 \
 --gateway 10.199.5.1
 
@@ -80,7 +80,8 @@ nova boot \
 --nic net-id=$(neutron net-show -f value -F id private) \
 --security-group ALL \
 --key-name mykey \
-private-instance
+--user-data user_data_ubuntu.txt \
+c1
 
 neutron floatingip-create public
 
@@ -95,7 +96,8 @@ nova boot \
 --nic net-id=$(neutron net-show -f value -F id private) \
 --security-group ALL \
 --key-name mykey \
-private-instance-u
+--user-data user_data_ubuntu.txt \
+u1
 
 neutron floatingip-create public
 
