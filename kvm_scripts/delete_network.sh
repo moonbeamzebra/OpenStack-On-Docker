@@ -3,7 +3,7 @@ source ~/demo-openrc.sh
 
 
 
-#neutron router-interface-add router private
+neutron router-interface-delete router private
 
 #neutron router-gateway-set router public
 
