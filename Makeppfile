@@ -26,7 +26,7 @@ install_mariadb: build_mariadb
                        --hostname mariadb \
                        --name openstack-mariadb \
                        --env-file ./env.list \
-                       -v /var/lib/mysql:/var/lib/mysql \
+                       -v /var/lib/openstack-mariadb/mysql:/var/lib/mysql \
                        openstack-mariadb
     sleep 15
 
