@@ -42,13 +42,13 @@ add-apt-repository cloud-archive:liberty -y
 apt-get update -y
 apt-get -y install crudini curl
 
-#cp /etc/sysctl.conf /etc/sysctl.conf.bak 
-#cat <<EOF >> /etc/sysctl.conf
-#net.ipv4.ip_forward=1
-#net.ipv4.conf.all.rp_filter=0
-#net.ipv4.conf.default.rp_filter=0
-#EOF
-#sysctl -p
+cp /etc/sysctl.conf /etc/sysctl.conf.bak 
+cat <<EOF >> /etc/sysctl.conf
+net.ipv4.ip_forward=1
+net.ipv4.conf.default.rp_filter=0
+net.ipv4.conf.all.rp_filter=0
+EOF
+sysctl -p
 
 apt-get install -y \
 neutron-plugin-ml2 \
@@ -104,33 +104,35 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,vlan,v
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 tenant_network_types vxlan
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 mechanism_drivers openvswitch,l2population
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 extension_drivers port_security
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_flat flat_networks public
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_flat flat_networks external
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2_type_vxlan vni_ranges 1:1000
 
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_security_group True
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset True
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs local_ip $NET_OVERLAY_INTERFACE_IP_ADDRESS
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs enable_tunneling  True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs bridge_mappings vlan:br-vlan,external:br-ex
+
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent l2_population True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types gre,vxlan
+
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_security_group True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset True
+
+
 diff /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugins/ml2/ml2_conf.ini.bak
 
-sleep 5
-
-cp /etc/neutron/plugins/ml2/openvswitch_agent.ini /etc/neutron/plugins/ml2/openvswitch_agent.ini.bak
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup enable_security_group True
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup enable_ipset True
-
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip $NET_OVERLAY_INTERFACE_IP_ADDRESS
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs bridge_mappings public:br-ex
-
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent tunnel_types vxlan
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent l2_population True
 
 sleep 5
 
 cp /etc/neutron/l3_agent.ini /etc/neutron/l3_agent.ini.bak
 crudini --set /etc/neutron/l3_agent.ini DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
 crudini --set /etc/neutron/l3_agent.ini DEFAULT external_network_bridge ""
+crudini --set /etc/neutron/l3_agent.ini DEFAULT use_namespaces True
+crudini --set /etc/neutron/l3_agent.ini DEFAULT router_delete_namespaces True
 crudini --set /etc/neutron/l3_agent.ini DEFAULT verbose True
 diff /etc/neutron/l3_agent.ini /etc/neutron/l3_agent.ini.bak
 
@@ -140,6 +142,8 @@ cp /etc/neutron/dhcp_agent.ini  /etc/neutron/dhcp_agent.ini.bak
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dhcp_driver neutron.agent.linux.dhcp.Dnsmasq
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT enable_isolated_metadata True
+crudini --set /etc/neutron/dhcp_agent.ini DEFAULT use_namespaces True
+crudini --set /etc/neutron/dhcp_agent.ini DEFAULT dhcp_delete_namespaces True
 crudini --set /etc/neutron/dhcp_agent.ini DEFAULT verbose True
 diff /etc/neutron/dhcp_agent.ini  /etc/neutron/dhcp_agent.ini.bak
 
@@ -157,7 +161,7 @@ crudini --set /etc/neutron/metadata_agent.ini DEFAULT project_name service
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT username neutron
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT password $NEUTRON_PASS
 
-crudini --set /etc/neutron/metadata_agent.ini DEFAULT nova_metadata_ip $NEUTRON_HOST
+crudini --set /etc/neutron/metadata_agent.ini DEFAULT nova_metadata_ip $NOVA_HOST
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
 crudini --set /etc/neutron/metadata_agent.ini DEFAULT verbose True
 

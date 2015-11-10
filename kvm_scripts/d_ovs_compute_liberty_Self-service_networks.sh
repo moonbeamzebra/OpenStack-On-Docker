@@ -97,10 +97,12 @@ diff /etc/nova/nova.conf /etc/nova/nova.conf.bak
 service nova-compute restart
 rm -f /var/lib/nova/nova.sqlite
 
-#cat <<EOF >> /etc/sysctl.conf
-#net.ipv4.conf.all.rp_filter=0
-#net.ipv4.conf.default.rp_filter=0
-#EOF
+cat <<EOF >> /etc/sysctl.conf
+net.ipv4.conf.default.rp_filter=0
+net.ipv4.conf.all.rp_filter=0
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+EOF
 
 
 sysctl -p
@@ -144,26 +146,22 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_securit
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset True
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs local_ip $CMP1_OVERLAY_INTERFACE_IP_ADDRESS
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs enable_tunneling True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs bridge_mappings vlan:br-vlan
+
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types gre,vxlan
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent l2_population True
+
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_security_group True
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup enable_ipset True
+
+
 diff /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugins/ml2/ml2_conf.ini.bak
 
 sleep 5
 
-cp /etc/neutron/plugins/ml2/openvswitch_agent.ini /etc/neutron/plugins/ml2/openvswitch_agent.ini.bak
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup enable_security_group True
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini securitygroup enable_ipset True
-
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs local_ip $CMP1_OVERLAY_INTERFACE_IP_ADDRESS
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini ovs bridge_mappings public:br-ex
-
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent tunnel_types vxlan
-crudini --set /etc/neutron/plugins/ml2/openvswitch_agent.ini agent l2_population True
-
-sleep 5
-
-service openvswitch-switch restart
-ovs-vsctl add-br br-ex
-ovs-vsctl add-port br-ex $CMP1_PUBLIC_INTERFACE_NAME
 
 service nova-compute restart
 
