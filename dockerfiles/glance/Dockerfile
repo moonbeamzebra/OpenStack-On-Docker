@@ -2,7 +2,7 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-apt-get install -y glance python-glanceclient
+RUN apt-get install -y glance python-glanceclient
 
 
 ADD setup.sh setup.sh
