@@ -12,7 +12,7 @@ RUN apt-get install -y keystone apache2 libapache2-mod-wsgi memcached python-mem
 ADD setup.sh setup.sh
 
 RUN chmod +x setup.sh
-RUN setup.sh
+RUN ./setup.sh
 
 ADD run.sh run.sh
 
