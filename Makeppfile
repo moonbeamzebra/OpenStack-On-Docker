@@ -56,7 +56,7 @@ build_glance: build_openstack_base
     sudo makepp -C dockerfiles/glance build_image
 
 .PHONY: install_glance
-install_glance: build_glance install_mariadb install_rabbitmq install_keystone
+install_glance: build_glance install_rabbitmq 
     sudo docker run -d --hostname glance \
                        --name openstack-glance \
                        -p 9292:9292 \
