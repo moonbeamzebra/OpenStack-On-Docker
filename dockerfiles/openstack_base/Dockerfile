@@ -16,8 +16,3 @@ RUN apt-get update -y
 
 
 RUN apt-get install -y python-openstackclient
-
-ADD setup.sh setup.sh
-
-RUN chmod +x setup.sh
-RUN ./setup.sh
