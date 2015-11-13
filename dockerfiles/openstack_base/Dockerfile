@@ -6,10 +6,18 @@ RUN apt-get update && apt-get install -y \
         crudini \
         curl \
         mariadb-client-5.* \
-        python-mysqldb \
-        ubuntu-cloud-keyring
+        python-mysqldb
 
-RUN echo "deb http://ubuntu-cloud.archive.canonical.com/ubuntu" "trusty-updates/kilo main" > /etc/apt/sources.list.d/cloudarchive-kilo.list
 
-RUN apt-get update && apt-get install -y \
-    python-openstackclient
+## Get the packages
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository cloud-archive:liberty -y
+RUN apt-get update -y
+
+
+RUN apt-get install -y python-openstackclient
+
+ADD setup.sh setup.sh
+
+RUN chmod +x setup.sh
+RUN setup.sh
