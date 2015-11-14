@@ -12,4 +12,5 @@ service nova-scheduler restart
 service nova-conductor restart
 service nova-novncproxy restart
 
+
 tail -f /var/log/nova/*.log

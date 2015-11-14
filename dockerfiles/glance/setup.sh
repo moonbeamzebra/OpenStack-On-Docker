@@ -88,7 +88,7 @@ diff /etc/glance/glance-registry.conf  /etc/glance/glance-registry.conf.bak
 
 sleep 5
 
-su -s /bin/sh -c "glance-manage db_sync" glance
+su -s /bin/sh -c "glance-manage db_sync" glance 2>&1 > /var/log/glance/glance-manage.out 
 service glance-registry restart
 service glance-api restart
 rm -f /var/lib/glance/glance.sqlite
