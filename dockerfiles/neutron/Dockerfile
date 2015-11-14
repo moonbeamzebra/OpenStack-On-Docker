@@ -2,10 +2,10 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
-apt-get install -y \
-neutron-server \
-neutron-plugin-ml2 \
-python-neutronclient
+RUN apt-get install -y \
+    neutron-server \
+    neutron-plugin-ml2 \
+    python-neutronclient
 
 ADD run.sh run.sh
 ADD setup.sh setup.sh
