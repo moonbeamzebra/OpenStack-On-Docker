@@ -56,7 +56,7 @@ build_glance: build_openstack_base
     sudo makepp -C dockerfiles/glance build_image
 
 .PHONY: install_glance
-install_glance: build_glance install_rabbitmq 
+install_glance: build_glance 
     sudo docker run -d --hostname glance \
                        --name openstack-glance \
                        -p 9292:9292 \
@@ -70,7 +70,7 @@ build_nova: build_openstack_base
 
 # Use of privileged;  see https://github.com/docker/docker/issues/4424
 .PHONY: install_nova
-install_nova: build_nova install_mariadb install_glance install_rabbitmq install_keystone
+install_nova: build_nova 
     sudo docker run -d --hostname nova \
                        --name openstack-nova \
                        -privileged \
@@ -87,7 +87,7 @@ build_neutron: build_openstack_base
 # https://blog.sebastian-daschner.com/entries/docker0_network_connection
 # http://stackoverflow.com/questions/27563460/let-two-containers-getting-linked-to-eachother
 .PHONY: install_neutron
-install_neutron: build_neutron install_mariadb install_nova install_rabbitmq install_keystone
+install_neutron: build_neutron 
     sudo docker run -d --hostname neutron \
                        --name openstack-neutron \
                        -p 9696:9696 \
