@@ -18,5 +18,7 @@ ADD setup.sh setup.sh
 RUN chmod +x run.sh && chmod +x setup.sh
 
 EXPOSE 8774
+EXPOSE 8775
+EXPOSE 6080
 
 CMD ./setup.sh && sleep 5 && ./run.sh
