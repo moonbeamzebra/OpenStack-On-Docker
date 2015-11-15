@@ -7,7 +7,7 @@ RUN apt-get install -y openssl
 ENV ADMIN_TOKEN=c2905bc8ce0fgfgf7a9cf066a
 
 
-apt-get install -y keystone apache2 libapache2-mod-wsgi memcached python-memcache
+RUN apt-get install -y keystone apache2 libapache2-mod-wsgi memcached python-memcache
 
 
 
