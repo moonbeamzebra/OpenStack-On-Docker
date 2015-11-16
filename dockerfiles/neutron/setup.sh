@@ -1,5 +1,10 @@
 #! /bin/bash
 
+if [ -f /setup.done ];
+then
+   echo "Setup done" > /tmp/done
+   exit 0
+fi
 
 cat <<EOF > /admin-openrc.sh
 export OS_PROJECT_DOMAIN_ID=default
@@ -117,3 +122,5 @@ su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
 
 
 service neutron-server restart
+
+touch /setup.done
