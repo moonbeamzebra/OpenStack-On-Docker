@@ -1,5 +1,11 @@
 #! /bin/bash
 
+if [ -f /setup.done ];
+then
+   echo "Setup done" > /tmp/done
+   exit 0
+fi
+
 ## Set up keystone
 echo "CREATE DATABASE keystone;
 GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'localhost' IDENTIFIED BY '$KEYSTONE_DBPASS';
@@ -20,7 +26,7 @@ diff /etc/keystone/keystone.conf /etc/keystone/keystone.conf.bak
 
 sleep 5
 
-su -s /bin/sh -c "keystone-manage db_sync" keystone
+su -s /bin/sh -c "keystone-manage db_sync" keystone 2>&1 > /var/log/keystone/keystone-manage.out 
 
 cat <<EOF > /etc/apache2/sites-available/wsgi-keystone.conf
 Listen 5000
@@ -138,4 +144,4 @@ export OS_IMAGE_API_VERSION=2
 EOF
 
 
-
+touch /setup.done
