@@ -18,21 +18,21 @@ HEAT_PASS=heat1
 CEIL_PASS=lab1
 DEMO_PASS=demo
 METADATA_SECRET=metadata_secret1
-RABBIT_HOST=10.199.1.220
-KEYSTONE_HOST=10.199.1.220
-HORIZON_HOST=10.199.1.220
-CINDER_HOST=10.199.1.220
-GLANCE_HOST=10.199.1.220
-NOVA_HOST=10.199.1.220
-NEUTRON_HOST=10.199.1.220
-HEAT_HOST=10.199.1.220
-MONGO_HOST=10.199.1.220
-CEIL_HOST=10.199.1.220
-MYSQLHOST=10.199.1.220
+RABBIT_HOST=10.199.1.26
+KEYSTONE_HOST=10.199.1.26
+HORIZON_HOST=10.199.1.26
+CINDER_HOST=10.199.1.26
+GLANCE_HOST=10.199.1.26
+NOVA_HOST=10.199.1.26
+NEUTRON_HOST=10.199.1.26
+HEAT_HOST=10.199.1.26
+MONGO_HOST=10.199.1.26
+CEIL_HOST=10.199.1.26
+MYSQLHOST=10.199.1.26
 REGION1=RegionOne
-CMP1_MANAGEMENT_INTERFACE_IP_ADDRESS=10.199.1.222
-NET_OVERLAY_INTERFACE_IP_ADDRESS=10.199.5.221
-CMP1_OVERLAY_INTERFACE_IP_ADDRESS=10.199.5.222
+CMP1_MANAGEMENT_INTERFACE_IP_ADDRESS=10.199.1.28
+NET_OVERLAY_INTERFACE_IP_ADDRESS=10.199.5.27
+CMP1_OVERLAY_INTERFACE_IP_ADDRESS=10.199.5.28
 NET_PUBLIC_INTERFACE_NAME=eth2
 CMP1_PUBLIC_INTERFACE_NAME=eth2
 
@@ -135,7 +135,8 @@ diff /etc/neutron/neutron.conf /etc/neutron/neutron.conf.bak
 sleep 5
 
 cp /etc/neutron/plugins/ml2/ml2_conf.ini /etc/neutron/plugins/ml2/ml2_conf.ini.bak
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,vlan,vxlan
+#crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,vlan,vxlan
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 type_drivers flat,vxlan
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 tenant_network_types vxlan
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 mechanism_drivers openvswitch,l2population
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ml2 extension_drivers port_security
@@ -148,9 +149,9 @@ crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_drive
 
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs local_ip $CMP1_OVERLAY_INTERFACE_IP_ADDRESS
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs enable_tunneling True
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs bridge_mappings vlan:br-vlan
+#crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini ovs bridge_mappings vlan:br-vlan
 
-crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types gre,vxlan
+crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent tunnel_types vxlan
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini agent l2_population True
 
 crudini --set /etc/neutron/plugins/ml2/ml2_conf.ini securitygroup firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
