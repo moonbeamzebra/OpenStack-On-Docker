@@ -2,6 +2,9 @@ FROM openstack-base
 
 ENV DEBIAN_FRONTEND noninteractive 
 
+ENV TZ=Canada/Eastern
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 RUN apt-get install -y openssl
 
 ENV ADMIN_TOKEN=c2905bc8ce0fgfgf7a9cf066a
