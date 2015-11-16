@@ -75,6 +75,7 @@ install_nova: build_nova
                        --name openstack-nova \
                        -privileged \
                        -p 8774:8774 \
+                       -p 6080:6080 \
                        --env-file ./env.list \
                        openstack-nova
 
@@ -132,7 +133,7 @@ build_horizon: build_openstack_base
     sudo makepp -C dockerfiles/horizon build_image
 
 .PHONY: install_horizon
-install_horizon: build_horizon install_keystone install_glance install_nova install_neutron
+install_horizon: build_horizon 
     sudo docker run -d --hostname horizon --name openstack-horizon -p 8888:80 --env-file ./env.list  openstack-horizon
 
 .PHONY: clean
