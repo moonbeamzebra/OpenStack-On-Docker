@@ -1,5 +1,11 @@
 #! /bin/bash
 
+if [ -f /setup.done ];
+then
+   echo "Setup done" > /tmp/done
+   exit 0
+fi
+
 cat <<EOF > /admin-openrc.sh
 export OS_PROJECT_DOMAIN_ID=default
 export OS_USER_DOMAIN_ID=default
@@ -92,3 +98,5 @@ su -s /bin/sh -c "glance-manage db_sync" glance 2>&1 > /var/log/glance/glance-ma
 service glance-registry restart
 service glance-api restart
 rm -f /var/lib/glance/glance.sqlite
+
+touch /setup.done
