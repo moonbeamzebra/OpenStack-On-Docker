@@ -1,5 +1,11 @@
 #! /bin/bash
 
+if [ -f /setup.done ];
+then
+   echo "Setup done" > /tmp/done
+   exit 0
+fi
+
 cat <<EOF > /admin-openrc.sh
 export OS_PROJECT_DOMAIN_ID=default
 export OS_USER_DOMAIN_ID=default
@@ -109,3 +115,5 @@ service nova-conductor restart
 service nova-novncproxy restart
 
 rm -f /var/lib/nova/nova.sqlite
+
+touch /setup.done
