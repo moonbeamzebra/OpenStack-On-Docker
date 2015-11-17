@@ -18,7 +18,7 @@ neutron net-update public --router:external
 
 source ~/demo-openrc.sh
 
-neutron net-create private --provider:network_type vxlan
+neutron net-create private
 
 neutron subnet-create private 172.16.1.0/24 --name private --gateway 172.16.1.1
 
