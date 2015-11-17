@@ -75,6 +75,7 @@ install_nova: build_nova
                        --name openstack-nova \
                        -privileged \
                        -p 8774:8774 \
+                       -p 8775:8775 \
                        -p 6080:6080 \
                        --env-file ./env.list \
                        openstack-nova
